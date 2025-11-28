@@ -1,0 +1,35 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: web-ui
+  namespace: realtime-pricing
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: web-ui
+  template:
+    metadata:
+      labels:
+        app: web-ui
+    spec:
+      containers:
+        - name: web-ui
+          image: web-ui:dev
+          imagePullPolicy: IfNotPresent
+          ports:
+            - containerPort: 80
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: web-ui
+  namespace: realtime-pricing
+spec:
+  type: ClusterIP
+  selector:
+    app: web-ui
+  ports:
+    - port: 80
+      targetPort: 80
+      protocol: TCP

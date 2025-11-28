@@ -1,0 +1,26 @@
+:root {
+  --bg: #f9fafb;
+  --panel: #ffffff;
+  --text: #111827;
+  --border: rgba(0, 0, 0, 0.15);
+}
+
+[data-theme="dark"] {
+  --bg: #0f172a;
+  --panel: rgba(15, 23, 42, 0.96);
+  --text: #ffffff;
+  --border: rgba(255, 255, 255, 0.15);
+}
+
+html,
+body {
+  background: var(--bg);
+  color: var(--text);
+  height: 100%;
+  margin: 0;
+  padding: 0;
+}
+
+* {
+  box-sizing: border-box;
+}

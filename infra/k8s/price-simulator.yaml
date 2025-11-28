@@ -1,0 +1,30 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: price-simulator
+  namespace: realtime-pricing
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: price-simulator
+  template:
+    metadata:
+      labels:
+        app: price-simulator
+    spec:
+      containers:
+        - name: price-simulator
+          image: price-simulator:dev
+          imagePullPolicy: IfNotPresent
+          env:
+            - name: KAFKA_BROKER
+              valueFrom:
+                configMapKeyRef:
+                  name: pricing-config
+                  key: KAFKA_BROKER
+            - name: KAFKA_TOPIC_TICKS
+              valueFrom:
+                configMapKeyRef:
+                  name: pricing-config
+                  key: KAFKA_TOPIC_TICKS

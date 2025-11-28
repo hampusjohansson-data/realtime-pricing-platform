@@ -1,0 +1,24 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: pipeline-processor
+  namespace: realtime-pricing
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: pipeline-processor
+  template:
+    metadata:
+      labels:
+        app: pipeline-processor
+    spec:
+      containers:
+        - name: pipeline-processor
+          image: pipeline-processor:dev
+          imagePullPolicy: IfNotPresent
+          envFrom:
+            - configMapRef:
+                name: pricing-config
+            - secretRef:
+                name: pricing-secrets

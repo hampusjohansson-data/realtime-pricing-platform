@@ -1,0 +1,61 @@
+# ---- REAL SECRETS / ENV ----
+.env
+*.env
+infra/env/*
+!infra/env/.gitkeep
+
+infra/k8s/secrets.yaml
+infra/k8s/secrets.*.yaml
+infra/k8s/secret*.yaml
+!infra/k8s/secrets.example.yaml
+
+# Lokala hjälpfiler
+HGETALL
+
+# ---- Go ----
+bin/
+dist/
+*.exe
+*.exe~
+*.dll
+*.so
+*.dylib
+*.test
+*.out
+
+/pkg/
+/build/
+
+# ---- Node / Frontend ----
+node_modules/
+web-ui/node_modules/
+web-ui/.vite/
+web-ui/dist/
+web-ui/.eslintcache
+
+# ---- Logs ----
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# ---- Docker / Data ----
+docker-compose.override.yml
+docker-data/
+postgres-data/
+redis-data/
+
+# ---- Kubernetes ----
+infra/k8s/*.local.yaml
+infra/k8s/*.dev.yaml
+infra/k8s/generated/
+
+# ---- IDE / Editor ----
+.vscode/
+.idea/
+.DS_Store
+
+# ---- Misc ----
+*.tmp
+*.swp
+*.swo

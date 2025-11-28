@@ -1,0 +1,146 @@
+version: "3.9"
+
+services:
+  zookeeper:
+    image: confluentinc/cp-zookeeper:7.5.0
+    container_name: zookeeper
+    environment:
+      ZOOKEEPER_CLIENT_PORT: 2181
+      ZOOKEEPER_TICK_TIME: 2000
+    ports:
+      - "2181:2181"
+    networks:
+      - app-net
+
+  kafka:
+    image: confluentinc/cp-kafka:7.5.0
+    container_name: kafka
+    depends_on:
+      - zookeeper
+    environment:
+      KAFKA_BROKER_ID: 1
+      KAFKA_ZOOKEEPER_CONNECT: zookeeper:2181
+      # Viktigt: host.docker.internal här (inte localhost)
+      KAFKA_ADVERTISED_LISTENERS: PLAINTEXT://kafka:9092,PLAINTEXT_HOST://host.docker.internal:29092
+      KAFKA_LISTENER_SECURITY_PROTOCOL_MAP: PLAINTEXT:PLAINTEXT,PLAINTEXT_HOST:PLAINTEXT
+      KAFKA_INTER_BROKER_LISTENER_NAME: PLAINTEXT
+      KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: 1
+    ports:
+      - "9092:9092"
+      - "29092:29092"
+    networks:
+      - app-net
+
+  kafka-ui:
+    image: provectuslabs/kafka-ui:latest
+    container_name: kafka-ui
+    depends_on:
+      - kafka
+    environment:
+      - KAFKA_CLUSTERS_0_NAME=local
+      - KAFKA_CLUSTERS_0_BOOTSTRAPSERVERS=kafka:9092
+      - KAFKA_CLUSTERS_0_ZOOKEEPER=zookeeper:2181
+    ports:
+      - "8081:8080"
+    networks:
+      - app-net
+
+  postgres:
+    image: postgres:16
+    container_name: postgres
+    environment:
+      - POSTGRES_USER=pricing
+      - POSTGRES_PASSWORD=pricing
+      - POSTGRES_DB=pricing
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres-data:/var/lib/postgresql/data
+    networks:
+      - app-net
+
+  redis:
+    image: redis:7-alpine
+    container_name: redis
+    ports:
+      - "6379:6379"
+    command: ["redis-server", "--save", "", "--appendonly", "no"]
+    networks:
+      - app-net
+
+  # --- GO-TJÄNSTER ---
+
+  api-gateway:
+    build:
+      context: ..
+      dockerfile: infra/api-gateway.Dockerfile
+    image: api-gateway:dev
+    container_name: api-gateway
+    depends_on:
+      - postgres
+      - redis
+      - kafka
+    environment:
+      KAFKA_BROKER: kafka:9092
+      KAFKA_TOPIC_TICKS: price_ticks
+      KAFKA_GROUP_ID: pipeline-processor
+      REDIS_ADDR: redis:6379
+      POSTGRES_DSN: postgres://pricing:pricing@postgres:5432/pricing?sslmode=disable
+      HTTP_ADDR: ":8088"
+    ports:
+      - "8088:8088"
+    networks:
+      - app-net
+
+  pipeline-processor:
+    build:
+      context: ..
+      dockerfile: infra/pipeline-processor.Dockerfile
+    image: pipeline-processor:dev
+    container_name: pipeline-processor
+    depends_on:
+      - kafka
+      - postgres
+      - redis
+    environment:
+      KAFKA_BROKER: kafka:9092
+      KAFKA_TOPIC_TICKS: price_ticks
+      KAFKA_GROUP_ID: pipeline-processor
+      REDIS_ADDR: redis:6379
+      POSTGRES_DSN: postgres://pricing:pricing@postgres:5432/pricing?sslmode=disable
+    networks:
+      - app-net
+
+  price-simulator:
+    build:
+      context: ..
+      dockerfile: infra/price-simulator.Dockerfile
+    image: price-simulator:dev
+    container_name: price-simulator
+    depends_on:
+      - kafka
+    environment:
+      KAFKA_BROKER: kafka:9092
+      KAFKA_TOPIC_TICKS: price_ticks
+    networks:
+      - app-net
+
+  web-ui:
+    build:
+      context: ../web-ui
+      dockerfile: Dockerfile
+    image: web-ui:dev
+    container_name: web-ui
+    depends_on:
+      - api-gateway
+    ports:
+      - "5173:80"
+    networks:
+      - app-net
+
+volumes:
+  postgres-data:
+
+networks:
+  app-net:
+    driver: bridge
