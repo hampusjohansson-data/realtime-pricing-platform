@@ -59,14 +59,15 @@ docker-compose up --build
 ```
 
 3. Tjänster och portar
-| Service                | URL / Port            |
-|------------------------|-----------------------|
-| Frontend (Web UI)      | http://localhost:5173 |
-| API Gateway            | http://localhost:8080 |
-| Kafka Broker           | localhost:9092        |
-| Kafka UI (om aktiverad)| http://localhost:8081 |
-| Postgres               | localhost:5432        |
-| Redis                  | localhost:6379        |
+
+   | Service                 | URL / Port             |
+   |-------------------------|------------------------|
+   | Frontend (Web UI)       | http://localhost:5173  |
+   | API Gateway             | http://localhost:8080  |
+   | Kafka Broker            | localhost:9092         |
+   | Kafka UI (om aktiverad) | http://localhost:8081  |
+   | Postgres                | localhost:5432         |
+   | Redis                   | localhost:6379         |
 
 4. Dashboard
 Web UI visar:
