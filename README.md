@@ -13,31 +13,15 @@ Projektet är utformat som en produktionliknande mini-stack och lämpar sig väl
 ---
 # Architecture Overview
 ```mermaid
+```mermaid
 flowchart LR
-    subgraph Producer
-        PS["price-simulator<br/>Go service"]
-    end
-
-    subgraph Streaming
-        K["Kafka<br/>price_ticks topic"]
-    end
-
-    subgraph Processing
-        PP["pipeline-processor<br/>Go service"]
-    end
-
-    subgraph Storage
-        PG["Postgres<br/>price_ticks_enriched"]
-        R["Redis<br/>latest price per symbol"]
-    end
-
-    subgraph API
-        API["api-gateway<br/>Go HTTP API"]
-    end
-
-    subgraph UI
-        WEB["Web UI<br/>React + Vite"]
-    end
+    PS["price-simulator<br/>Go service"]
+    K["Kafka<br/>price_ticks topic"]
+    PP["pipeline-processor<br/>Go service"]
+    PG["Postgres<br/>price_ticks_enriched"]
+    R["Redis<br/>latest price per symbol"]
+    API["api-gateway<br/>Go HTTP API"]
+    WEB["Web UI<br/>React + Vite"]
 
     PS --> K
     K --> PP
@@ -46,6 +30,7 @@ flowchart LR
     PG --> API
     R --> API
     API --> WEB
+
 
 ```
 
