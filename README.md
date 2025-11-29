@@ -13,7 +13,6 @@ Projektet är utformat som en produktionliknande mini-stack och lämpar sig väl
 ---
 # Architecture Overview
 ```mermaid
-```mermaid
 flowchart LR
     PS["price-simulator<br/>Go service"]
     K["Kafka<br/>price_ticks topic"]
